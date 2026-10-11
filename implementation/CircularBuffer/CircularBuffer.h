@@ -2,9 +2,6 @@
 #ifndef CIRCULARBUFFER_H
 #define CIRCULARBUFFER_H
 
-#include <stdexcept>
-#include <utility>
-
 template <typename T>
 class CircularBuffer {
 private:
@@ -15,143 +12,50 @@ private:
     int _size;
 
 public:
-    explicit CircularBuffer(int capacity)
-        : _data(nullptr),
-          _capacity(capacity),
-          _head(0),
-          _tail(0),
-          _size(0) {
-        if (capacity <= 0) {
-            throw std::invalid_argument(
-                "Capacity must be positive"
-            );
-        }
-
-        _data = new T[capacity]{};
-    }
-
-    ~CircularBuffer() {
-        delete[] _data;
-    }
-
-    CircularBuffer(const CircularBuffer& other)
-        : _data(new T[other._capacity]),
-          _capacity(other._capacity),
-          _head(0),
-          _tail(other._size % other._capacity),
-          _size(other._size) {
-        try {
-            for (int i = 0; i < _size; ++i) {
-                _data[i] = other[i];
-            }
-        } catch (...) {
-            delete[] _data;
-            throw;
-        }
-    }
-
-    CircularBuffer& operator=(const CircularBuffer& other) {
-        if (this != &other) {
-            CircularBuffer temp(other);
-
-            std::swap(_data, temp._data);
-            std::swap(_capacity, temp._capacity);
-            std::swap(_head, temp._head);
-            std::swap(_tail, temp._tail);
-            std::swap(_size, temp._size);
-        }
-
-        return *this;
-    }
-
-    void push_back(const T& x) {
-        if (is_full()) {
-            throw std::overflow_error("Buffer is full");
-        }
-
-        _data[_tail] = x;
-        _tail = (_tail + 1) % _capacity;
-        ++_size;
-    }
-
-    void pop_front() {
-        if (is_empty()) {
-            throw std::out_of_range("Buffer is empty");
-        }
-
-        _head = (_head + 1) % _capacity;
-        --_size;
-    }
-
-    T& operator[](int index) {
-        if (index < 0 || index >= _size) {
-            throw std::out_of_range("Index out of range");
-        }
-
-        return _data[(_head + index) % _capacity];
-    }
-
-    const T& operator[](int index) const {
-        if (index < 0 || index >= _size) {
-            throw std::out_of_range("Index out of range");
-        }
-
-        return _data[(_head + index) % _capacity];
-    }
-
-    T& front() {
-        if (is_empty()) {
-            throw std::out_of_range("Buffer is empty");
-        }
-
-        return _data[_head];
-    }
-
-    const T& front() const {
-        if (is_empty()) {
-            throw std::out_of_range("Buffer is empty");
-        }
-
-        return _data[_head];
-    }
-
-    T& back() {
-        if (is_empty()) {
-            throw std::out_of_range("Buffer is empty");
-        }
-
-        return _data[(_tail + _capacity - 1) % _capacity];
-    }
-
-    const T& back() const {
-        if (is_empty()) {
-            throw std::out_of_range("Buffer is empty");
-        }
-
-        return _data[(_tail + _capacity - 1) % _capacity];
-    }
-
-    bool is_full() const {
-        return _size == _capacity;
-    }
-
-    bool is_empty() const {
-        return _size == 0;
-    }
-
-    void clear() {
-        _head = 0;
-        _tail = 0;
-        _size = 0;
-    }
-
-    int capacity() const {
-        return _capacity;
-    }
-
-    int size() const {
-        return _size;
-    }
+    /// 1. Конструктор с capacity
+    explicit CircularBuffer(int capacity);
+    
+    /// 2. Деструктор
+    ~CircularBuffer();
+    
+    /// 3. Конструктор копирования
+    CircularBuffer(const CircularBuffer& other);
+    
+    /// 4. Оператор присваивания
+    CircularBuffer& operator=(const CircularBuffer& other);
+    
+    /// 5. push_back(const T& x) - добавить в конец
+    void push_back(const T& x);
+    
+    /// 6. pop_front() - удалить с начала
+    void pop_front();
+    
+    /// 7. operator[](int index) - доступ по индексу
+    T& operator[](int index);
+    const T& operator[](int index) const;
+    
+    /// 8. front() - первый элемент
+    T& front();
+    const T& front() const;
+    
+    /// 9. back() - последний элемент
+    T& back();
+    const T& back() const;
+    
+    /// 10. is_full() - буфер полон
+    bool is_full() const;
+    
+    /// 11. is_empty() - буфер пуст
+    bool is_empty() const;
+    
+    /// 12. clear() - очистить
+    void clear();
+    
+    /// 13. capacity() - размер буфера
+    int capacity() const;
+    
+    /// 14. size() - количество элементов
+    int size() const;
 };
 
-#endif
+#endif // CIRCULARBUFFER_H
